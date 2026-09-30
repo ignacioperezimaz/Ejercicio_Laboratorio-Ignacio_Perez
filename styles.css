@@ -1,0 +1,1134 @@
+*{box-sizing:border-box}
+:root{--bg:#f6f7f8;--surface:#fff;--soft:#f5f7f9;--border:#20252b;--text:#18212b;--muted:#607083;--blue:#0b6fc2;--green:#20e51a;--red:#ff6d73;--orange:#ff9f1a;--purple:#d77ce8;--explore:#4b87df}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}button,select,input{font:inherit}
+.app{width:min(1550px,98vw);margin:12px auto;display:grid;grid-template-columns:260px minmax(600px,1fr) 350px;grid-template-rows:auto minmax(680px,calc(100vh - 125px)) auto;grid-template-areas:"left top top" "left map metrics";gap:10px}
+.left-panel{grid-area:left;background:#fff;border:2px solid var(--border);border-radius:34px;padding:20px 16px;overflow:auto}.left-panel h2{margin:0 0 12px;font-size:18px}.small-label,.field-grid label,.random-goals>label{display:block;margin-bottom:5px;font-size:12px;font-weight:bold}.left-panel select,.left-panel input{width:100%;min-height:32px;padding:5px 8px;border:2px solid var(--border);border-radius:6px;background:#fff;color:var(--text)}
+.algorithm-info{margin-top:10px;min-height:116px;padding:14px;border:2px solid var(--border);border-radius:20px;background:#f5f7f9;color:#4d6277;font-size:14px;line-height:1.48}.algorithm-info .algo-title{display:block;margin-bottom:5px;color:#30465a;font-weight:700}.algorithm-info .criterion{display:block;margin-top:20px}.algorithm-info .criterion b{color:#30465a}.divider{height:1px;margin:14px 0;background:#454b52}.title-row{display:flex;align-items:baseline;justify-content:space-between;gap:6px}.title-row span{font-size:9px;font-weight:bold}
+.scenario-grid,.tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.scenario-grid button,.tool-grid button,#randomGoalsBtn{min-height:34px;padding:5px 6px;background:#fff;border:2px solid var(--border);border-radius:7px;cursor:pointer;font-size:11px}.scenario-grid button:hover,.tool-grid button:hover,#randomGoalsBtn:hover{background:#edf5ff}.tool.active{background:#dceefe;border-color:#0b6fc2}.scenario-grid small{font-size:8px;color:#687482}.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}.random-goals{margin-top:15px}.inline-field{display:grid;grid-template-columns:1fr auto;gap:6px}.note{margin:24px 6px 0;font-size:12px;line-height:1.4}
+.top-panel{grid-area:top;min-height:80px;padding:15px 18px;display:flex;align-items:center;gap:18px;background:#fff;border:2px solid var(--border);border-radius:18px}.animation-control{min-width:290px;display:grid;grid-template-columns:auto auto 1fr auto;gap:8px;align-items:center;font-size:10px}.animation-control input{width:100%;accent-color:#111}.animation-control b{font-size:11px}.explore-toggle{display:flex;align-items:center;gap:5px;white-space:nowrap;font-size:10px;font-weight:bold}.top-actions{margin-left:auto;display:flex;align-items:center;gap:7px;flex-wrap:wrap}.top-actions button{min-height:34px;border:2px solid var(--border);border-radius:7px;background:#fff;cursor:pointer;padding:6px 12px;font-size:12px}.top-actions button.primary{background:var(--blue);border-color:#111;color:#fff}.top-actions button.danger{background:#ffd9dc;color:#d9222d;border-color:#d44}.ready-badge{display:flex;align-items:center;gap:6px;min-height:34px;padding:6px 10px;border:2px solid var(--border);border-radius:7px;background:#fff;font-size:11px}.ready-badge span,.route-badge span{width:13px;height:13px;border-radius:50%;background:var(--green);display:inline-block;border:1px solid #0aa407}
+.map-panel{grid-area:map;display:flex;flex-direction:column;min-width:0;min-height:0;padding:22px 55px 12px;background:#fff;border:2px solid var(--border);border-radius:70px}.map-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin:0 18px 7px;font-size:12px}.map-header p{margin:2px 0 0;font-size:10px;font-weight:bold}.route-badge{min-width:145px;display:flex;justify-content:center;align-items:center;gap:8px;padding:6px 10px;background:#eee;border:2px solid var(--border);border-radius:6px;font-size:11px}
+.grid{width:min(100%,680px);aspect-ratio:1;margin:0 auto;display:grid;grid-template-columns:repeat(20,1fr);grid-template-rows:repeat(20,1fr);border:1px solid #20252b;background:#eef4fa;outline:none}.cell{position:relative;display:grid;place-items:center;background:#f8fbfd;border-right:1px solid #d7e0e8;border-bottom:1px solid #d7e0e8;color:#334155;font-size:10px;user-select:none}.cell.cursor{outline:3px solid #111;outline-offset:-3px;z-index:3}.cell.wall{background:#102a43;color:transparent}.cell.weighted{background:#cfa7e8;color:#fff;font-weight:800}.cell.explored{background:var(--explore);color:#102b4e}.cell.path{background:var(--orange);color:#472700;font-weight:bold}.cell.start,.cell.goal{font-size:0}.cell.start::after{content:"S";width:62%;height:62%;border-radius:50%;background:#68c99a;border:1px solid #3a9c72;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;line-height:1}.cell.goal::after{content:"M";width:58%;height:58%;background:#f6b65f;border:1px solid #c8872f;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:800;line-height:1;border-radius:4px}
+.legend{margin:18px -56px -13px;min-height:70px;padding:12px 22px;display:flex;align-items:center;justify-content:space-around;flex-wrap:wrap;gap:10px;border:2px solid var(--border);border-radius:14px;background:#fff;font-size:11px;font-weight:bold}.legend span{display:flex;align-items:center;gap:10px}.symbol{width:23px;height:23px;display:inline-block;border:1px solid #111}.start-symbol{width:19px;height:19px;border-radius:50%;background:#5bc98a;border:1px solid #379d65;position:relative}.start-symbol::after{content:"S";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800}.goal-symbol{width:20px;height:20px;background:#f6b65f;border:1px solid #c8872f;position:relative;transform:none;border-radius:4px}.goal-symbol::after{content:"M";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:900}.wall-symbol{background:#102a43}.weight-symbol{background:#cfa7e8;position:relative}.weight-symbol::after{content:"x";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:13px}.explore-symbol{background:var(--explore)}.path-symbol{background:var(--orange)}
+.metrics-panel{grid-area:metrics;align-self:start;height:auto;max-height:none;padding:20px 22px;background:#fff;border:2px solid var(--border);border-radius:40px;overflow:visible}.metrics-title{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}.metrics-title h2{margin:0;font-size:16px}.metrics-title span{font-size:10px;font-weight:bold}.metric-box{padding:14px;background:#f3f3f3;border:2px solid var(--border);border-radius:12px;font-size:12px}.metric-box>strong{display:block;margin-top:14px;font-size:16px}.status-box{min-height:82px}#metricStatus{margin:9px 0 12px;font-size:14px}.status-line{display:flex;justify-content:space-between;gap:8px}.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}.metric-grid .metric-box{min-height:76px}.total-box{margin-bottom:12px;min-height:66px}.method-card{min-height:125px;padding:16px 14px;background:#f3f3f3;border:2px solid var(--border);border-radius:26px;color:#526577;font-size:13px;line-height:1.5}.method-card .method-title{display:block;margin-bottom:8px;color:#30465a;font-weight:bold;font-size:15px}.comparison{margin-top:14px;padding-top:12px;border-top:1px solid #bbb}.comparison h3{margin:0 0 8px;font-size:14px}.compare-row{padding:8px 0;border-bottom:1px solid #ddd;font-size:11px;line-height:1.45}.compare-row strong{display:block}.hidden{display:none}
+@media(max-width:1180px){.app{grid-template-columns:240px minmax(540px,1fr);grid-template-areas:"left top" "left map" "left metrics";grid-template-rows:auto auto auto}.metrics-panel{border-radius:24px}.top-panel{flex-wrap:wrap}.top-actions{margin-left:0}}
+@media(max-width:820px){.app{display:block}.left-panel,.top-panel,.map-panel,.metrics-panel{margin-bottom:12px}.left-panel{border-radius:24px}.map-panel{border-radius:28px;padding:18px 20px 10px}.legend{margin:16px -21px -11px}.grid{min-width:520px}}
+
+
+/* V7 - símbolos de las herramientas de dibujo */
+.tool{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:8px;
+  text-align:left;
+}
+
+.tool-symbol{
+  width:30px;
+  height:30px;
+  flex:0 0 30px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  border:2px solid #20252b;
+  border-radius:0;
+  background:#fff;
+  color:transparent;
+  font-size:0;
+  font-weight:800;
+  line-height:1;
+}
+
+.obstacle-symbol{
+  background:#102a43;
+  color:#102a43;
+}
+
+.erase-symbol{
+  background:#fff;
+  font-size:15px;
+}
+
+.start-tool-symbol{
+  border-radius:50%;
+  background:#14f20d;
+  color:#073b06;
+}
+
+.goal-tool-symbol{
+  background:#ff9f1a;
+  color:#4a2800;
+}
+
+.weight-tool-symbol{
+  background:#d77ce8;
+  color:#3d1745;
+}
+
+/* V8 */
+.cell.weighted{
+  font-size:10px;
+  letter-spacing:-0.2px;
+}
+
+
+/* V9 - símbolos del panel izquierdo */
+.tool{
+  min-height:40px;
+}
+
+.tool-symbol{
+  width:30px !important;
+  height:30px !important;
+  flex:0 0 30px !important;
+  border:2px solid #20252b !important;
+  border-radius:0 !important;
+  background:#fff !important;
+  position:relative;
+  overflow:hidden;
+  color:transparent !important;
+  font-size:0 !important;
+}
+
+/* Obstáculo: bloque azul marino dentro de la casilla */
+.obstacle-symbol::before{
+  content:"";
+  width:17px;
+  height:17px;
+  background:#17324d;
+  border-radius:2px;
+}
+
+/* Borrar */
+.erase-symbol::before{
+  content:"⌫";
+  color:#536273;
+  font-size:17px;
+  font-weight:700;
+}
+
+/* Inicio: casilla cuadrada + círculo verde pastel + S blanca */
+.start-tool-symbol::before{
+  content:"S";
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  background:#68c99a;
+  border:1px solid #3a9c72;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:11px;
+  font-weight:900;
+  line-height:1;
+}
+
+/* Meta: casilla cuadrada + símbolo pastel + M blanca */
+.goal-tool-symbol::before{
+  content:"M";
+  width:18px;
+  height:18px;
+  border-radius:4px;
+  background:#f6b65f;
+  border:1px solid #c8872f;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:10px;
+  font-weight:900;
+  line-height:1;
+}
+
+/* Peso: casilla cuadrada + bloque morado pastel + x blanca */
+.weight-tool-symbol::before{
+  content:"x";
+  width:18px;
+  height:18px;
+  border-radius:3px;
+  background:#cfa7e8;
+  border:1px solid #a979ca;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+  font-weight:900;
+  line-height:1;
+}
+
+/* Peso en el mapa: x + valor, siempre blanco */
+.cell.weighted{
+  background:#cfa7e8 !important;
+  color:#fff !important;
+  font-weight:900;
+}
+
+/* Inicio del mapa más parecido a la referencia */
+.cell.start::after{
+  background:#68c99a !important;
+  border-color:#3a9c72 !important;
+  color:#fff !important;
+}
+
+
+/* V10 - TABLA COMPARATIVA */
+.comparison-panel{
+  grid-area:comparison;
+  margin-top:6px;
+  padding:16px 18px 14px;
+  background:#fff;
+  border:2px solid var(--border);
+  border-radius:16px;
+  min-width:0;
+}
+
+.comparison-header{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:8px;
+}
+
+.comparison-header h2{
+  margin:0;
+  font-size:16px;
+}
+
+.comparison-header p{
+  margin:3px 0 0;
+  color:#738195;
+  font-size:10px;
+}
+
+.comparison-controls{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.comparison-controls button,
+.comparison-controls select{
+  height:32px;
+  padding:5px 12px;
+  border:1.5px solid #20252b;
+  border-radius:6px;
+  background:#fff;
+  color:#18212b;
+  font-size:11px;
+  font-weight:700;
+}
+
+.comparison-controls button:hover{
+  background:#edf5ff;
+  cursor:pointer;
+}
+
+.comparison-controls button.active{
+  background:#dceefe;
+  border-color:#0b6fc2;
+  color:#075690;
+}
+
+.comparison-legend{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  margin:4px 0 8px 6px;
+  font-size:10px;
+  font-weight:700;
+  color:#536273;
+}
+
+.comparison-legend span{
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+
+.route-dot{
+  width:9px;
+  height:9px;
+  display:inline-block;
+  border-radius:2px;
+}
+
+.bfs-dot{background:#e98262}
+.dfs-dot{background:#8f6ee8}
+.ucs-dot{background:#5fb083}
+.astar-dot{background:#5489c9}
+
+.comparison-table-wrap{
+  overflow-x:auto;
+}
+
+.comparison-table{
+  width:100%;
+  border-collapse:collapse;
+  table-layout:fixed;
+  font-size:10px;
+}
+
+.comparison-table th{
+  padding:6px 8px;
+  text-align:left;
+  color:#728096;
+  font-size:9px;
+  font-weight:800;
+  border-bottom:1px solid #d9e0e7;
+}
+
+.comparison-table td{
+  padding:7px 8px;
+  border-bottom:1px solid #e6ebf0;
+  color:#435166;
+}
+
+.comparison-table tbody tr:nth-child(odd){
+  background:#fbfcfd;
+}
+
+.comparison-table tbody tr.selected-row{
+  background:#eef6ff;
+}
+
+.comparison-table td:first-child{
+  font-weight:800;
+  color:#26384b;
+}
+
+.empty-comparison{
+  text-align:center!important;
+  padding:18px!important;
+  color:#8a96a6!important;
+}
+
+/* Colores de las rutas comparativas sobre el mapa */
+.cell.compare-bfs{box-shadow:inset 0 0 0 4px #e98262}
+.cell.compare-dfs{box-shadow:inset 0 0 0 4px #8f6ee8}
+.cell.compare-ucs{box-shadow:inset 0 0 0 4px #5fb083}
+.cell.compare-astar{box-shadow:inset 0 0 0 4px #5489c9}
+.cell.compare-overlap{
+  background:
+    linear-gradient(
+      135deg,
+      #e98262 0 25%,
+      #8f6ee8 25% 50%,
+      #5fb083 50% 75%,
+      #5489c9 75% 100%
+    )!important;
+  color:#fff!important;
+}
+
+@media(max-width:1180px){
+  .app{
+    grid-template-areas:
+      "left top"
+      "left map"
+      "left metrics"
+      "comparison comparison";
+  }
+
+  .comparison-panel{
+    margin-top:10px;
+  }
+}
+
+@media(max-width:820px){
+  .comparison-panel{
+    margin-bottom:12px;
+  }
+
+  .comparison-header{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+}
+
+
+/* V11 - CORRECCIÓN DE DISTRIBUCIÓN */
+@media (min-width:1181px){
+  .app{
+    grid-template-columns:260px minmax(600px,1fr) 350px !important;
+    grid-template-rows:auto auto auto !important;
+    grid-template-areas:
+      "left top top"
+      "left map metrics"
+      "comparison comparison ." !important;
+    align-items:start;
+  }
+
+  .left-panel{
+    align-self:stretch;
+  }
+
+  .map-panel{
+    align-self:start;
+    height:auto;
+    min-height:0;
+  }
+
+  .metrics-panel{
+    align-self:start;
+  }
+
+  .comparison-panel{
+    grid-area:comparison;
+    width:100%;
+    align-self:start;
+    margin-top:0;
+  }
+
+  /* Ya existe una tabla comparativa completa abajo:
+     no duplicamos la comparativa dentro de métricas. */
+  .metrics-panel > .comparison{
+    display:none !important;
+  }
+}
+
+/* La tabla debe quedar compacta y pegada a la zona superior */
+.comparison-panel{
+  box-sizing:border-box;
+}
+
+.comparison-table-wrap{
+  width:100%;
+}
+
+/* En pantallas intermedias mantenemos la comparativa debajo */
+@media (max-width:1180px) and (min-width:821px){
+  .app{
+    grid-template-columns:240px minmax(540px,1fr) !important;
+    grid-template-rows:auto auto auto auto !important;
+    grid-template-areas:
+      "left top"
+      "left map"
+      "left metrics"
+      "comparison comparison" !important;
+    align-items:start;
+  }
+
+  .map-panel{
+    align-self:start;
+    height:auto;
+  }
+
+  .comparison-panel{
+    grid-area:comparison;
+    width:100%;
+  }
+
+  .metrics-panel > .comparison{
+    display:none !important;
+  }
+}
+
+
+/* V12 - comparativa explicable */
+.comparison-table{
+  table-layout:auto;
+}
+
+.comparison-table th:nth-child(7),
+.comparison-table td:nth-child(7){
+  width:31%;
+}
+
+.comparison-observation{
+  color:#526577!important;
+  line-height:1.38;
+}
+
+.best-metric{
+  font-weight:900!important;
+  color:#075690!important;
+  background:#e9f4ff!important;
+  border-radius:4px;
+}
+
+.comparison-summary{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-top:12px;
+}
+
+.comparison-summary>div{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  border:1px solid #d9e0e7;
+  border-radius:9px;
+  background:#f8fafc;
+  font-size:10px;
+}
+
+.comparison-summary span{
+  color:#6b788a;
+  font-weight:700;
+}
+
+.comparison-summary strong{
+  color:#26384b;
+  text-align:right;
+}
+
+@media(max-width:900px){
+  .comparison-summary{
+    grid-template-columns:1fr;
+  }
+
+  .comparison-table th:nth-child(7),
+  .comparison-table td:nth-child(7){
+    min-width:230px;
+  }
+}
+
+
+/* V14 - tabla realmente dinámica */
+.comparison-table th:nth-child(9),
+.comparison-table td:nth-child(9){
+  min-width:260px;
+}
+
+.comparison-live-badge{
+  color:#16803c;
+  font-weight:800;
+}
+
+.comparison-table td{
+  vertical-align:top;
+}
+
+
+/* V15 - indicador de datos realmente dinámicos */
+.comparison-live-status{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  margin:5px 0 8px 5px;
+  color:#5e6c7e;
+  font-size:10px;
+}
+
+.comparison-live-status strong{
+  color:#1f6b3d;
+}
+
+.live-dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#30c96b;
+  box-shadow:0 0 0 3px rgba(48,201,107,.12);
+}
+
+.comparison-table tbody{
+  transition:opacity .12s ease;
+}
+
+
+/* =========================================================
+   V18 · REDISEÑO VISUAL
+   Solo presentación. La lógica de la V17 no se modifica.
+   ========================================================= */
+
+:root{
+  --v18-bg:#f3f6fa;
+  --v18-card:#ffffff;
+  --v18-card-soft:#f8fafc;
+  --v18-line:#dbe3ec;
+  --v18-line-strong:#c8d2de;
+  --v18-text:#172234;
+  --v18-muted:#6f7f93;
+  --v18-blue:#4f8edc;
+  --v18-blue-dark:#326faa;
+  --v18-blue-soft:#eaf3ff;
+  --v18-green:#69c99b;
+  --v18-green-soft:#eaf8f1;
+  --v18-orange:#f3b769;
+  --v18-purple:#cba7e6;
+  --v18-red:#e9787e;
+  --v18-navy:#1d3852;
+  --v18-shadow:0 10px 30px rgba(46,72,104,.08);
+  --v18-shadow-soft:0 4px 14px rgba(46,72,104,.06);
+}
+
+body{
+  background:
+    radial-gradient(circle at 12% 0%, rgba(138,190,239,.16), transparent 26%),
+    linear-gradient(180deg,#f8fafc 0%,var(--v18-bg) 100%) !important;
+  color:var(--v18-text) !important;
+  font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif !important;
+}
+
+.app{
+  width:min(1560px,97vw) !important;
+  gap:14px !important;
+  margin:18px auto 26px !important;
+}
+
+/* ---------- superficies principales ---------- */
+.left-panel,
+.top-panel,
+.map-panel,
+.metrics-panel,
+.comparison-panel{
+  background:rgba(255,255,255,.97) !important;
+  border:1px solid var(--v18-line) !important;
+  box-shadow:var(--v18-shadow) !important;
+}
+
+.left-panel{
+  border-radius:24px !important;
+  padding:22px 18px !important;
+}
+
+.top-panel{
+  min-height:78px !important;
+  border-radius:20px !important;
+  padding:14px 18px !important;
+  background:
+    linear-gradient(135deg,#ffffff 0%,#f7fbff 100%) !important;
+}
+
+.map-panel{
+  border-radius:28px !important;
+  padding:20px 30px 12px !important;
+}
+
+.metrics-panel{
+  border-radius:24px !important;
+  padding:20px !important;
+}
+
+.comparison-panel{
+  border-radius:20px !important;
+  padding:18px 20px !important;
+}
+
+/* ---------- tipografía ---------- */
+.left-panel h2,
+.metrics-title h2,
+.comparison-header h2{
+  color:#172234 !important;
+  letter-spacing:.025em !important;
+  font-weight:800 !important;
+}
+
+.left-panel h2{
+  font-size:16px !important;
+}
+
+.title-row span,
+.metrics-title span,
+.small-label,
+.field-grid label,
+.random-goals>label{
+  color:var(--v18-muted) !important;
+}
+
+.note{
+  color:#617186 !important;
+  background:#f8fafc;
+  border:1px solid #e3e9f0;
+  border-radius:12px;
+  padding:11px 12px;
+  margin:20px 0 0 !important;
+}
+
+/* ---------- separadores ---------- */
+.divider{
+  height:1px !important;
+  background:#e1e7ee !important;
+  margin:17px 0 !important;
+}
+
+/* ---------- selects e inputs ---------- */
+.left-panel select,
+.left-panel input,
+.comparison-controls select{
+  border:1px solid var(--v18-line-strong) !important;
+  border-radius:9px !important;
+  background:#fff !important;
+  color:var(--v18-text) !important;
+  min-height:36px !important;
+  transition:border-color .15s ease,box-shadow .15s ease !important;
+}
+
+.left-panel select:focus,
+.left-panel input:focus,
+.comparison-controls select:focus{
+  outline:none !important;
+  border-color:#6da3df !important;
+  box-shadow:0 0 0 3px rgba(79,142,220,.13) !important;
+}
+
+/* ---------- tarjeta de explicación ---------- */
+.algorithm-info,
+.method-card{
+  border:1px solid #dce4ed !important;
+  background:linear-gradient(180deg,#f9fbfd,#f4f7fa) !important;
+  color:#5b6d82 !important;
+  box-shadow:none !important;
+}
+
+.algorithm-info{
+  border-radius:16px !important;
+  padding:14px 15px !important;
+}
+
+.method-card{
+  border-radius:18px !important;
+  padding:16px !important;
+}
+
+.algorithm-info .algo-title,
+.method-card .method-title,
+.algorithm-info .criterion b,
+.method-card b{
+  color:#2b435c !important;
+}
+
+/* ---------- botones generales ---------- */
+.scenario-grid button,
+.tool-grid button,
+#randomGoalsBtn,
+.top-actions button,
+.comparison-controls button{
+  border:1px solid var(--v18-line-strong) !important;
+  border-radius:9px !important;
+  background:#fff !important;
+  color:#33465b !important;
+  box-shadow:0 1px 2px rgba(32,54,78,.03) !important;
+  transition:
+    transform .12s ease,
+    border-color .12s ease,
+    background .12s ease,
+    box-shadow .12s ease !important;
+}
+
+.scenario-grid button:hover,
+.tool-grid button:hover,
+#randomGoalsBtn:hover,
+.top-actions button:hover:not(:disabled),
+.comparison-controls button:hover:not(:disabled){
+  background:#f4f8fd !important;
+  border-color:#9fb8d2 !important;
+  transform:translateY(-1px);
+  box-shadow:var(--v18-shadow-soft) !important;
+}
+
+.tool.active,
+.comparison-controls button.active{
+  background:var(--v18-blue-soft) !important;
+  border-color:#72a4dc !important;
+  color:#28649e !important;
+}
+
+/* botones principales */
+.top-actions button.primary{
+  background:linear-gradient(180deg,#5b98df,#467fc1) !important;
+  color:#fff !important;
+  border-color:#3e74af !important;
+  box-shadow:0 4px 10px rgba(69,125,190,.18) !important;
+}
+
+.top-actions button.primary:hover:not(:disabled){
+  background:linear-gradient(180deg,#528fd5,#3d74b1) !important;
+}
+
+.top-actions button.danger{
+  background:#fff3f3 !important;
+  color:#c75e65 !important;
+  border-color:#efbec2 !important;
+}
+
+button:disabled,
+select:disabled{
+  opacity:.47 !important;
+  cursor:not-allowed !important;
+}
+
+/* ---------- herramientas ---------- */
+.tool{
+  min-height:46px !important;
+  border-radius:10px !important;
+  padding:7px 9px !important;
+}
+
+.tool-symbol{
+  width:31px !important;
+  height:31px !important;
+  flex-basis:31px !important;
+  border:1px solid #aebac7 !important;
+  border-radius:7px !important;
+  box-shadow:inset 0 0 0 2px #fff;
+}
+
+.obstacle-symbol::before{
+  background:var(--v18-navy) !important;
+  border-radius:4px !important;
+}
+
+.start-tool-symbol::before{
+  background:var(--v18-green) !important;
+  border-color:#50aa7f !important;
+}
+
+.goal-tool-symbol::before{
+  background:var(--v18-orange) !important;
+  border-color:#d59b4d !important;
+}
+
+.weight-tool-symbol::before{
+  background:var(--v18-purple) !important;
+  border-color:#ac82ca !important;
+}
+
+/* ---------- superior ---------- */
+.animation-control{
+  padding:8px 10px;
+  border:1px solid #e2e8ef;
+  border-radius:12px;
+  background:#f8fafc;
+}
+
+.animation-control input{
+  accent-color:var(--v18-blue) !important;
+}
+
+.explore-toggle{
+  padding:8px 10px;
+  border:1px solid #e2e8ef;
+  border-radius:12px;
+  background:#f8fafc;
+}
+
+.ready-badge{
+  border:1px solid #d6e2db !important;
+  background:var(--v18-green-soft) !important;
+  color:#397457 !important;
+  border-radius:10px !important;
+  font-weight:700;
+}
+
+.ready-badge span,
+.route-badge span{
+  background:#66c995 !important;
+  border-color:#42a875 !important;
+}
+
+/* ---------- cabecera mapa ---------- */
+.map-header{
+  margin:0 4px 11px !important;
+  align-items:center !important;
+}
+
+.map-header strong{
+  font-size:13px;
+  color:#203249;
+}
+
+.map-header p{
+  color:#718197;
+  font-weight:500 !important;
+  line-height:1.4;
+}
+
+.route-badge{
+  border:1px solid #d4dde7 !important;
+  border-radius:10px !important;
+  background:#f8fafc !important;
+  color:#4e6075 !important;
+  min-width:135px !important;
+}
+
+/* ---------- cuadrícula ---------- */
+.grid{
+  border:1px solid #aebdcb !important;
+  border-radius:5px;
+  overflow:hidden;
+  background:#f8fbfe !important;
+  box-shadow:0 3px 12px rgba(44,70,98,.06);
+}
+
+.cell{
+  background:#f9fbfd !important;
+  border-right:1px solid #dce5ed !important;
+  border-bottom:1px solid #dce5ed !important;
+  transition:background .08s ease,box-shadow .08s ease !important;
+}
+
+.cell.wall{
+  background:var(--v18-navy) !important;
+}
+
+.cell.weighted{
+  background:#cba7e6 !important;
+  color:#fff !important;
+}
+
+.cell.explored{
+  background:#75a9e6 !important;
+  color:#fff !important;
+}
+
+.cell.path{
+  background:#f2ae45 !important;
+  color:#fff !important;
+}
+
+.cell.start::after{
+  background:var(--v18-green) !important;
+  border-color:#4fa97e !important;
+  box-shadow:0 1px 4px rgba(58,156,114,.25);
+}
+
+.cell.goal::after{
+  background:var(--v18-orange) !important;
+  border-color:#d79d51 !important;
+  box-shadow:0 1px 4px rgba(199,135,47,.2);
+}
+
+.cell.cursor{
+  outline:2px solid #3f78b6 !important;
+  outline-offset:-2px !important;
+}
+
+/* ---------- leyenda ---------- */
+.legend{
+  margin:16px -31px -13px !important;
+  min-height:62px !important;
+  border:1px solid var(--v18-line) !important;
+  border-radius:0 0 27px 27px !important;
+  background:#fbfcfe !important;
+  color:#53657a !important;
+  font-weight:600 !important;
+  box-shadow:none !important;
+}
+
+.symbol{
+  border-color:#8392a2 !important;
+  border-radius:4px;
+}
+
+.wall-symbol{
+  background:var(--v18-navy) !important;
+}
+
+.weight-symbol{
+  background:var(--v18-purple) !important;
+}
+
+.explore-symbol{
+  background:#75a9e6 !important;
+}
+
+.path-symbol{
+  background:#f2ae45 !important;
+}
+
+/* ---------- métricas ---------- */
+.metrics-title{
+  padding-bottom:11px;
+  margin-bottom:12px !important;
+  border-bottom:1px solid #e4e9ef;
+}
+
+.metric-box{
+  border:1px solid #dde4eb !important;
+  border-radius:13px !important;
+  background:#f8fafc !important;
+  color:#506176 !important;
+}
+
+.metric-box b{
+  color:#31465c;
+}
+
+.metric-box>strong{
+  color:#1e324a;
+  font-size:18px !important;
+}
+
+.status-box{
+  background:linear-gradient(135deg,#f7fbff,#f8fafc) !important;
+}
+
+.total-box{
+  background:#eef6ff !important;
+  border-color:#cfdfef !important;
+}
+
+/* ---------- comparativa ---------- */
+.comparison-header{
+  align-items:center !important;
+  margin-bottom:10px !important;
+}
+
+.comparison-header h2{
+  font-size:17px !important;
+}
+
+.comparison-header p{
+  color:#728297 !important;
+  font-size:11px !important;
+  line-height:1.45;
+}
+
+.comparison-live-status{
+  margin:8px 0 10px !important;
+  padding:7px 10px;
+  width:max-content;
+  max-width:100%;
+  border:1px solid #dfe7ef;
+  border-radius:999px;
+  background:#f8fafc;
+}
+
+.live-dot{
+  background:#78b99b !important;
+  box-shadow:0 0 0 3px rgba(105,201,155,.14) !important;
+}
+
+.comparison-legend{
+  margin:8px 0 10px !important;
+  gap:15px !important;
+}
+
+.route-dot{
+  width:10px !important;
+  height:10px !important;
+  border-radius:50% !important;
+}
+
+.comparison-table-wrap{
+  border:1px solid #e0e6ed;
+  border-radius:12px;
+  overflow:auto !important;
+}
+
+.comparison-table{
+  background:#fff;
+  border-collapse:separate !important;
+  border-spacing:0 !important;
+}
+
+.comparison-table th{
+  background:#f5f8fb !important;
+  color:#687a90 !important;
+  padding:9px 10px !important;
+  border-bottom:1px solid #dde5ed !important;
+  white-space:nowrap;
+}
+
+.comparison-table td{
+  padding:10px !important;
+  color:#4a5e74 !important;
+  border-bottom:1px solid #edf1f5 !important;
+  background:#fff;
+}
+
+.comparison-table tbody tr:last-child td{
+  border-bottom:0 !important;
+}
+
+.comparison-table tbody tr:nth-child(odd){
+  background:transparent !important;
+}
+
+.comparison-table tbody tr:hover td{
+  background:#f8fbfe;
+}
+
+.comparison-table tbody tr.selected-row td{
+  background:#edf6ff !important;
+}
+
+.best-metric{
+  color:#276da8 !important;
+  background:#e7f2ff !important;
+  font-weight:800 !important;
+}
+
+.comparison-observation{
+  color:#66788d !important;
+}
+
+.comparison-summary{
+  gap:12px !important;
+  margin-top:14px !important;
+}
+
+.comparison-summary>div{
+  border:1px solid #dde5ed !important;
+  border-radius:12px !important;
+  background:#f8fafc !important;
+  padding:11px 13px !important;
+}
+
+.comparison-summary span{
+  color:#76869a !important;
+}
+
+.comparison-summary strong{
+  color:#31465d !important;
+}
+
+.comparison-controls button,
+.comparison-controls select{
+  min-height:36px !important;
+  height:36px !important;
+}
+
+/* rutas comparativas un poco más finas y limpias */
+.cell.compare-bfs{box-shadow:inset 0 0 0 3px #e68b6e !important}
+.cell.compare-dfs{box-shadow:inset 0 0 0 3px #9477d9 !important}
+.cell.compare-ucs{box-shadow:inset 0 0 0 3px #6caf8e !important}
+.cell.compare-astar{box-shadow:inset 0 0 0 3px #5f8fc4 !important}
+
+/* ---------- responsive ---------- */
+@media(max-width:1180px){
+  .app{
+    gap:12px !important;
+  }
+
+  .left-panel,
+  .top-panel,
+  .map-panel,
+  .metrics-panel,
+  .comparison-panel{
+    border-radius:18px !important;
+  }
+}
+
+@media(max-width:820px){
+  body{
+    background:#f5f7fa !important;
+  }
+
+  .app{
+    width:min(100% - 18px,760px) !important;
+    margin:10px auto 18px !important;
+  }
+
+  .map-panel{
+    padding:16px !important;
+  }
+
+  .legend{
+    margin:14px -17px -17px !important;
+    border-radius:0 0 18px 18px !important;
+  }
+
+  .comparison-controls{
+    width:100%;
+  }
+}

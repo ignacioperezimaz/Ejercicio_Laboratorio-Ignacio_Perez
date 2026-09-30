@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laberinto IA 20×20 - V6</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main class="app">
+  <aside class="left-panel">
+    <section>
+      <h2>ALGORITMO</h2>
+      <label class="small-label" for="algorithm">Método de búsqueda</label>
+      <select id="algorithm">
+        <option value="bfs">BFS - Búsqueda en anchura</option>
+        <option value="dfs">DFS - Búsqueda en profundidad</option>
+        <option value="ucs">UCS - Coste Uniforme</option>
+        <option value="astar">A* - Estrella</option>
+      </select>
+      <div id="algorithmInfo" class="algorithm-info"></div>
+    </section>
+
+    <div class="divider"></div>
+
+    <section>
+      <div class="title-row"><h2>ESCENARIOS</h2><span>para comparar</span></div>
+      <div class="scenario-grid">
+        <button data-scenario="steps">Menos pasos<br><small>ruta corta</small></button>
+        <button data-scenario="weights">Pesos<br><small>ruta cara</small></button>
+        <button data-scenario="goal-cost">Meta con coste<br><small>coste vs distancia</small></button>
+        <button data-scenario="no-solution">Sin solución<br><small>barrera completa</small></button>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <section>
+      <div class="title-row"><h2>DIBUJO</h2><span>arrastra sobre la cuadrícula</span></div>
+      <div class="tool-grid">
+        <button class="tool active" data-mode="wall"><span class="tool-symbol obstacle-symbol">■</span><span>Obstáculo</span></button>
+        <button class="tool" data-mode="erase"><span class="tool-symbol erase-symbol">⌫</span><span>Borrar</span></button>
+        <button class="tool" data-mode="start"><span class="tool-symbol start-tool-symbol">S</span><span>Inicio</span></button>
+        <button class="tool" data-mode="goal"><span class="tool-symbol goal-tool-symbol">M</span><span>Meta</span></button>
+        <button class="tool" data-mode="weight"><span class="tool-symbol weight-tool-symbol">x</span><span>Peso</span></button>
+      </div>
+
+      <div class="field-grid">
+        <div><label for="tileWeight">Peso de baldosa</label><input id="tileWeight" type="number" min="1" max="99" value="5"></div>
+        <div><label for="goalCost">Coste de la meta</label><input id="goalCost" type="number" min="0" max="999" value="0"></div>
+      </div>
+
+      <div class="random-goals">
+        <label for="randomGoals">Metas aleatorias</label>
+        <div class="inline-field"><input id="randomGoals" type="number" min="1" max="12" value="3"><button id="randomGoalsBtn">Generar</button></div>
+      </div>
+
+      <p class="note">Con <b>Peso</b>, pinta baldosas blancas: el número es el coste de entrar en ellas (1 es normal). UCS y A* lo usan; BFS y DFS lo ignoran. El coste de meta es una penalización opcional.</p>
+    </section>
+  </aside>
+
+  <section class="top-panel">
+    <div class="animation-control">
+      <b>ANIMACIÓN</b><span>DESPACIO</span><input id="speed" type="range" min="1" max="100" value="60"><span>RÁPIDO</span>
+    </div>
+    <label class="explore-toggle"><input id="showExploration" type="checkbox" checked> Mostrar exploración</label>
+    <div class="top-actions">
+      <button id="runBtn" class="primary">▶ Ejecutar</button>
+      <button id="compareBtn" class="primary">▣ Comparar todos</button>
+      <button id="pauseBtn">⏸ Pausar</button>
+      <button id="randomBtn">✦ Aleatorio</button>
+      <button id="clearBtn" class="danger">Limpiar</button>
+      <div id="readyBadge" class="ready-badge"><span></span> Listo para jugar</div>
+    </div>
+  </section>
+
+  <section class="map-panel">
+    <div class="map-header">
+      <div><strong>Mapa 20×20</strong><p id="toolHint">Herramienta activa: obstáculo. Haz clic o arrastra para pintar. Con teclado, usa flechas y Enter.</p></div>
+      <div id="routeBadge" class="route-badge"><span></span> Sin ruta</div>
+    </div>
+
+    <div id="grid" class="grid" tabindex="0" aria-label="Mapa 20 por 20"></div>
+
+    <div class="legend">
+      <span><i class="symbol start-symbol"></i> Inicio</span>
+      <span><i class="symbol goal-symbol"></i> Meta</span>
+      <span><i class="symbol wall-symbol"></i> Obstáculo</span>
+      <span><i class="symbol weight-symbol"></i> Baldosa con peso</span>
+      <span><i class="symbol explore-symbol"></i> Explorando</span>
+      <span><i class="symbol path-symbol"></i> Ruta final</span>
+    </div>
+  </section>
+
+  <aside class="metrics-panel">
+    <div class="metrics-title"><h2>MÉTRICAS</h2><span>última ejecución</span></div>
+
+    <div class="metric-box status-box">
+      <b>Estado</b>
+      <div id="metricStatus">Preparado</div>
+      <div class="status-line"><b>Meta alcanzada</b><span id="metricGoal">—</span></div>
+    </div>
+
+    <div class="metric-grid">
+      <div class="metric-box"><b>Exploradas</b><strong id="metricExplored">0</strong></div>
+      <div class="metric-box"><b>Pasos</b><strong id="metricSteps">0</strong></div>
+      <div class="metric-box"><b>Coste ruta</b><strong id="metricRouteCost">0</strong></div>
+      <div class="metric-box"><b>Coste meta</b><strong id="metricGoalCost">0</strong></div>
+    </div>
+
+    <div class="metric-box total-box"><b>Coste total</b><strong id="metricTotal">0</strong></div>
+    <div id="methodInfo" class="method-card"></div>
+
+    <div id="comparison" class="comparison hidden"><h3>Comparación</h3><div id="comparisonContent"></div></div>
+  </aside>
+
+  <!-- TABLA COMPARATIVA -->
+  <section class="comparison-panel">
+    <div class="comparison-header">
+      <div>
+        <h2>COMPARATIVA</h2>
+        <p>Pulsa “Comparar todos” para calcular BFS, DFS, UCS y A* con el tablero actual.</p>
+      </div>
+
+      <div class="comparison-controls">
+        <button id="alternateRoutesBtn" disabled>Alternar rutas</button>
+        <button id="overlayRoutesBtn" disabled>Superponer rutas</button>
+
+        <select id="comparisonAlgorithm" disabled>
+          <option value="bfs">BFS</option>
+          <option value="dfs">DFS</option>
+          <option value="ucs">UCS</option>
+          <option value="astar">A*</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="comparison-live-status"><span class="live-dot"></span><strong id="mapRevisionLabel">Sin comparar</strong><span>Si modificas el tablero, la comparativa vuelve a cero.</span></div>
+
+    <div class="comparison-legend">
+      <span><i class="route-dot bfs-dot"></i>BFS</span>
+      <span><i class="route-dot dfs-dot"></i>DFS</span>
+      <span><i class="route-dot ucs-dot"></i>UCS</span>
+      <span><i class="route-dot astar-dot"></i>A*</span>
+    </div>
+
+    <div class="comparison-table-wrap">
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>ALGORITMO</th>
+            <th>META</th>
+            <th>EXPLORADAS</th>
+            <th>PASOS</th>
+            <th>COSTE RUTA</th>
+            <th>COSTE META</th>
+            <th>COSTE TOTAL</th>
+            <th>CÁLCULO</th>
+            <th>QUÉ SE OBSERVA</th>
+          </tr>
+        </thead>
+        <tbody id="comparisonTableBody">
+          <tr data-alg="bfs">
+            <td>BFS</td>
+            <td>—</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0.00 ms</td>
+            <td>Sin calcular</td>
+          </tr>
+          <tr data-alg="dfs">
+            <td>DFS</td>
+            <td>—</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0.00 ms</td>
+            <td>Sin calcular</td>
+          </tr>
+          <tr data-alg="ucs">
+            <td>Coste Uniforme</td>
+            <td>—</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0.00 ms</td>
+            <td>Sin calcular</td>
+          </tr>
+          <tr data-alg="astar">
+            <td>A*</td>
+            <td>—</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0.00 ms</td>
+            <td>Sin calcular</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="comparisonSummary" class="comparison-summary">
+      <div><span>Menos pasos</span><strong id="summarySteps">0</strong></div>
+      <div><span>Menor coste real</span><strong id="summaryCost">0</strong></div>
+      <div><span>Menos exploradas</span><strong id="summaryExplored">0</strong></div>
+    </div>
+  </section>
+
+</main>
+<script src="script.js"></script>
+<script src="scenarios.js"></script>
+</body>
+</html>
