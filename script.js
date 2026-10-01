@@ -7,6 +7,7 @@ const metricStatus=$("metricStatus"),metricGoal=$("metricGoal"),metricExplored=$
 const comparison=$("comparison"),comparisonContent=$("comparisonContent");
 const comparisonTableBody=$("comparisonTableBody"),alternateRoutesBtn=$("alternateRoutesBtn"),overlayRoutesBtn=$("overlayRoutesBtn"),comparisonAlgorithm=$("comparisonAlgorithm");
 const comparisonSummary=$("comparisonSummary"),summarySteps=$("summarySteps"),summaryCost=$("summaryCost"),summaryExplored=$("summaryExplored");
+const metaWarning=$("metaWarning"),closeMetaWarning=$("closeMetaWarning");
 const mapRevisionLabel=$("mapRevisionLabel");
 const toolButtons=[...document.querySelectorAll(".tool")],scenarioButtons=[...document.querySelectorAll("[data-scenario]")];
 const dirs=[[-1,0],[0,1],[1,0],[0,-1]];
@@ -207,8 +208,24 @@ function setMetrics(result,alg,elapsed){
   const rc=routeCost(result.path),gc=result.goal.penalty||0,total=rc+gc;
   metricStatus.textContent=`Meta alcanzada · ${elapsed.toFixed(2)} ms`;metricGoal.textContent=`M${result.goal.id}`;metricExplored.textContent=result.order.length;metricSteps.textContent=result.path.length-1;metricRouteCost.textContent=rc;metricGoalCost.textContent=gc;metricTotal.textContent=total;routeBadge.innerHTML=`<span></span> Ruta a M${result.goal.id}`
 }
+
+function showMetaWarning(){
+  if(!metaWarning)return;
+
+  metaWarning.classList.remove("hidden");
+
+  clearTimeout(showMetaWarning.timer);
+  showMetaWarning.timer=setTimeout(()=>{
+    metaWarning.classList.add("hidden");
+  },3500);
+}
+
 async function runSearch(){
-  if(running||!goals.length)return;
+  if(running)return;
+  if(!goals.length){
+    showMetaWarning();
+    return;
+  }
   running=true;paused=false;pauseBtn.textContent="⏸ Pausar";readyBadge.innerHTML="<span style=\'background:#facc15\'></span> Ejecutando";setLocked(true);clearSearchVisuals();
   const alg=algorithm.value,t0=performance.now(),result=getAlgorithmFn(alg)(),t1=performance.now();
   setMetrics(result,alg,t1-t0);
@@ -405,7 +422,14 @@ goalCost.addEventListener("input",()=>{
 tileWeight.addEventListener("input",()=>{
   // Cambia únicamente el valor que se aplicará al pintar.
 });
-pauseBtn.addEventListener("click",()=>{if(!running)return;paused=!paused;pauseBtn.textContent=paused?"▶ Reanudar":"⏸ Pausar";readyBadge.innerHTML=paused?"<span style='background:#facc15'></span> Pausado":"<span style='background:#facc15'></span> Ejecutando"});runBtn.addEventListener("click",runSearch);compareBtn.addEventListener("click",compareAll);randomBtn.addEventListener("click",randomMaze);clearBtn.addEventListener("click",clearSearch);randomGoalsBtn.addEventListener("click",makeRandomGoals);
+pauseBtn.addEventListener("click",()=>{if(!running)return;paused=!paused;pauseBtn.textContent=paused?"▶ Reanudar":"⏸ Pausar";readyBadge.innerHTML=paused?"<span style='background:#facc15'></span> Pausado":"<span style='background:#facc15'></span> Ejecutando"});runBtn.addEventListener("click",runSearch);compareBtn.addEventListener("click",compareAll);
+
+if(closeMetaWarning){
+  closeMetaWarning.addEventListener("click",()=>{
+    metaWarning.classList.add("hidden");
+  });
+}
+randomBtn.addEventListener("click",randomMaze);clearBtn.addEventListener("click",clearSearch);randomGoalsBtn.addEventListener("click",makeRandomGoals);
 
 alternateRoutesBtn.addEventListener("click",()=>{
   const order=["bfs","dfs","ucs","astar"];

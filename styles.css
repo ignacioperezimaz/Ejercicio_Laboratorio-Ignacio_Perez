@@ -1132,3 +1132,47 @@ select:disabled{
     width:100%;
   }
 }
+
+
+/* Aviso al intentar ejecutar sin ninguna meta */
+.meta-warning{
+  position:fixed;
+  top:24px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:9999;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  max-width:520px;
+  width:calc(100% - 32px);
+  padding:13px 16px;
+  border:1px solid #efb4b4;
+  border-radius:12px;
+  background:#fff4f4;
+  color:#8f3838;
+  box-shadow:0 8px 24px rgba(77,37,37,.14);
+  font-size:14px;
+}
+
+.meta-warning strong{
+  white-space:nowrap;
+}
+
+.meta-warning span{
+  flex:1;
+}
+
+.meta-warning button{
+  border:0;
+  background:transparent;
+  color:#8f3838;
+  font-size:20px;
+  line-height:1;
+  cursor:pointer;
+  padding:0 2px;
+}
+
+.meta-warning.hidden{
+  display:none;
+}
