@@ -97,7 +97,7 @@ En este mapa no hay pesos importantes, así que lo principal es la cantidad de p
 - **BFS:** encuentra una ruta de 7 pasos.
 - **DFS:** encuentra una ruta mucho más larga, de 34 pasos.
 - **UCS:** también encuentra la ruta de 7 pasos porque todas las celdas tienen prácticamente el mismo coste.
-- **A*:** encuentra la misma ruta de 7 pasos, pero explorando menos nodos.
+- **A\*:** encuentra la misma ruta de 7 pasos, pero explorando menos nodos.
 
 **Conclusión:** este escenario muestra que BFS funciona bien cuando buscamos pocos pasos y que A* puede llegar al mismo resultado explorando menos.
 
@@ -108,7 +108,7 @@ En este mapa existe un camino corto, pero algunas de sus celdas tienen un coste 
 - **BFS:** encuentra una ruta corta de 17 pasos, pero su coste total es 113.
 - **DFS:** encuentra otra ruta de 39 pasos y coste 39.
 - **UCS:** encuentra una ruta de 19 pasos y coste 19.
-- **A*:** también consigue coste 19.
+- **A\*:** también consigue coste 19.
 
 **Conclusión:** aquí se ve que tener menos pasos no significa tener menor coste. UCS y A* tienen en cuenta los pesos y por eso encuentran una solución más barata que BFS.
 
@@ -119,7 +119,7 @@ En este caso hay varias metas. Una está más cerca, pero tiene una penalizació
 - **BFS:** llega a la meta cercana en 6 pasos, pero el coste total es 26.
 - **DFS:** encuentra otra solución con coste 39.
 - **UCS:** elige la meta con menor coste total, que cuesta 19.
-- **A*:** también elige una solución con coste total 19.
+- **A\*:** también elige una solución con coste total 19.
 
 **Conclusión:** BFS se fija principalmente en los pasos, mientras que UCS y A* tienen en cuenta el coste completo y pueden elegir una meta más lejana si sale más barata.
 
@@ -130,7 +130,7 @@ En este mapa una barrera de obstáculos impide llegar a la meta.
 - **BFS:** no encuentra ruta.
 - **DFS:** no encuentra ruta.
 - **UCS:** no encuentra ruta.
-- **A*:** no encuentra ruta.
+- **A\*:** no encuentra ruta.
 
 Los cuatro terminan la búsqueda después de explorar las posiciones accesibles.
 
@@ -143,7 +143,7 @@ En resumen:
 - **BFS** es útil cuando queremos una ruta con pocos pasos.
 - **DFS** puede encontrar una solución, pero no garantiza que sea la mejor.
 - **UCS** es más adecuado cuando existen diferentes costes.
-- **A*** también tiene en cuenta el coste y utiliza la heurística para intentar llegar a la solución explorando menos nodos.
+- **A\*** también tiene en cuenta el coste y utiliza la heurística para intentar llegar a la solución explorando menos nodos.
 
 ## 5. Lenguaje de etiquetado y lenguaje de programación
 
